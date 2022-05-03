@@ -21,20 +21,20 @@ async function run() {
   try {
     await client.connect();
     const inventoryCollection = client.db("wareHouse").collection("items");
-    //post test mongodb
+    //post item in database
     app.post("/inventory", async (req, res) => {
-      const newInventory = req.body;
-      const result = await inventoryCollection.insertOne(newInventory);
+      const newItem = req.body;
+      const result = await inventoryCollection.insertOne(newItem);
       res.send(result);
     });
-    //get inventories
+    //get items from database
     app.get("/inventory", async (req, res) => {
       const query = {};
       const cursor = inventoryCollection.find(query);
-      const inventories = await cursor.toArray();
-      res.send(inventories);
+      const items = await cursor.toArray();
+      res.send(items);
     });
-    //Update inventory item
+    //Update item in database
     app.put("/inventory/:id", async (req, res) => {
       const id = req.params.id;
       const data = req.body;
@@ -47,6 +47,13 @@ async function run() {
         options
       );
       res.send(result);
+    });
+    //Get single item from database
+    app.get("/inventory/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) }
+      const item = await inventoryCollection.findOne(query)
+      res.send(item)
     });
   } finally {
   }
