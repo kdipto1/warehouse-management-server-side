@@ -55,6 +55,13 @@ async function run() {
       const item = await inventoryCollection.findOne(query)
       res.send(item)
     });
+    //Delete single item from database
+    app.delete("/inventory/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await inventoryCollection.deleteOne(query)
+      res.send(result);
+    });
   } finally {
   }
 }
