@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 const express = require("express");
 const cors = require("cors");
@@ -10,8 +10,7 @@ app.use(express.json());
 
 //mongodb connect
 
-const uri =
-  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.p85dy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.p85dy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -35,18 +34,24 @@ async function run() {
       const inventories = await cursor.toArray();
       res.send(inventories);
     });
-  }
-  finally {
-    
+    //Update inventory item
+    app.put("/inventory/:id", async (req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert : true };
+      const updateDoc = { $set: { quantity: data.quantity } };
+      const result = await inventoryCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.send(result);
+    });
+  } finally {
   }
 }
-run().catch(console.dir)
-
-
-
-
-
-
+run().catch(console.dir);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
