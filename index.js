@@ -21,20 +21,20 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    const inventoryCollection = client.db("wareHouse").collection("inventories");
+    const inventoryCollection = client.db("wareHouse").collection("items");
     //post test mongodb
-    app.post('/inventories', async (req, res) => {
-      const newInventory = req.body
-      const result = await inventoryCollection.insertOne(newInventory)
+    app.post("/inventory", async (req, res) => {
+      const newInventory = req.body;
+      const result = await inventoryCollection.insertOne(newInventory);
       res.send(result);
-    })
+    });
     //get inventories
-    app.get('/inventories', async (req, res) => {
-      const query = {}
-      const cursor = inventoryCollection.find(query)
+    app.get("/inventory", async (req, res) => {
+      const query = {};
+      const cursor = inventoryCollection.find(query);
       const inventories = await cursor.toArray();
-      res.send(inventories)
-    })
+      res.send(inventories);
+    });
   }
   finally {
     
