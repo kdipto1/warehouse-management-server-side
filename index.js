@@ -24,20 +24,29 @@ async function run() {
     //post item in database
     app.post("/inventory", async (req, res) => {
       const newItem = req.body;
+      // console.log(req.body);
       const result = await inventoryCollection.insertOne(newItem);
       res.send(result);
     });
-    //get items from database
+    //Get all items from database
     app.get("/inventory", async (req, res) => {
+      const size = parseInt(req.query.size);
       const query = {};
       const cursor = inventoryCollection.find(query);
-      const items = await cursor.toArray();
+      let items;
+      if (size) {
+        items = await cursor.limit(size).toArray();
+      }
+      else {
+        items = await cursor.toArray()
+      }
       res.send(items);
     });
-    //Update item in database
+    //Update single item in database
     app.put("/inventory/:id", async (req, res) => {
       const id = req.params.id;
       const data = req.body;
+      // console.log(data);
       const filter = { _id: ObjectId(id) };
       const options = { upsert : true };
       const updateDoc = { $set: { quantity: data.quantity } };
