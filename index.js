@@ -36,9 +36,8 @@ async function run() {
       let items;
       if (size) {
         items = await cursor.limit(size).toArray();
-      }
-      else {
-        items = await cursor.toArray()
+      } else {
+        items = await cursor.toArray();
       }
       res.send(items);
     });
@@ -48,7 +47,7 @@ async function run() {
       const data = req.body;
       // console.log(data);
       const filter = { _id: ObjectId(id) };
-      const options = { upsert : true };
+      const options = { upsert: true };
       const updateDoc = { $set: { quantity: data.quantity } };
       const result = await inventoryCollection.updateOne(
         filter,
@@ -60,16 +59,25 @@ async function run() {
     //Get single item from database
     app.get("/inventory/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: ObjectId(id) }
-      const item = await inventoryCollection.findOne(query)
-      res.send(item)
+      const query = { _id: ObjectId(id) };
+      const item = await inventoryCollection.findOne(query);
+      res.send(item);
     });
     //Delete single item from database
     app.delete("/inventory/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const result = await inventoryCollection.deleteOne(query)
+      const result = await inventoryCollection.deleteOne(query);
       res.send(result);
+    });
+    //Get user added items
+    app.get("/inventoryUser", async (req, res) => {
+      console.log(req.query);
+      const email = req.query.email;
+      const query = { email: email };
+      const cursor = inventoryCollection.find(query);
+      const items = await cursor.toArray();
+      res.send(items);
     });
   } finally {
   }
