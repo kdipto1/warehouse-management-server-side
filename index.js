@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
+const jwt = require("jsonwebtoken");
 //middleware
 app.use(cors());
 app.use(express.json());
@@ -72,12 +73,31 @@ async function run() {
     });
     //Get user added items
     app.get("/inventoryUser", async (req, res) => {
-      console.log(req.query);
+      // console.log(req.query);
+      const userToken = req.headers.authorization;
+      console.log(userToken);
+      const [userEmail, accessToken] = userToken?.split(" ");
+      const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
       const email = req.query.email;
       const query = { email: email };
-      const cursor = inventoryCollection.find(query);
-      const items = await cursor.toArray();
-      res.send(items);
+      if (userEmail === decoded.email) {
+        const cursor = inventoryCollection.find(query);
+        const items = await cursor.toArray();
+        res.send(items);
+      }
+      else {
+        res.status(403).send({message: "Forbidden Access"})
+      }
+    });
+    //Get token api
+    app.post("/login", async (req, res) => {
+      const email = req.body;
+      // console.log(email);
+      const token = await jwt.sign(email, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1d",
+      });
+      // console.log(token);
+      res.send({ token: token });
     });
   } finally {
   }
