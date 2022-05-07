@@ -10,14 +10,26 @@ app.use(cors());
 app.use(express.json());
 
 //mongodb connect
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.p85dy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-
+function verifyToken(token) {
+  let userEmail;
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+    if (err) {
+      userEmail = "Invalid email";
+      console.log(err);
+    }
+    if (decoded) {
+      console.log(decoded);
+      userEmail = decoded;
+    }
+  });
+  return userEmail;
+}
 async function run() {
   try {
     await client.connect();
@@ -75,9 +87,9 @@ async function run() {
     app.get("/inventoryUser", async (req, res) => {
       // console.log(req.query);
       const userToken = req.headers.authorization;
-      console.log(userToken);
+      // console.log(userToken);
       const [userEmail, accessToken] = userToken?.split(" ");
-      const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+      const decoded = verifyToken(accessToken)
       const email = req.query.email;
       const query = { email: email };
       if (userEmail === decoded.email) {
