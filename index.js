@@ -38,7 +38,6 @@ async function run() {
     //post item in database
     app.post("/inventory", async (req, res) => {
       const newItem = req.body;
-      // console.log(req.body);
       const result = await inventoryCollection.insertOne(newItem);
       res.send(result);
     });
@@ -86,9 +85,7 @@ async function run() {
     });
     //Get user added items
     app.get("/inventoryUser", async (req, res) => {
-      // console.log(req.query);
       const userToken = req.headers.authorization;
-      // console.log(userToken);
       const [userEmail, accessToken] = userToken?.split(" ");
       const decoded = verifyToken(accessToken)
       console.log(decoded);
@@ -106,9 +103,7 @@ async function run() {
     //Get token api
     app.post("/login", async (req, res) => {
       const email = req.body;
-      // console.log(email);
       const token = await jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
-      // console.log(token);
       res.send({ token: token });
     });
   } finally {
