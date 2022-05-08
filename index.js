@@ -16,6 +16,7 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
+//verify token function
 function verifyToken(token) {
   let userEmail;
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
@@ -90,6 +91,7 @@ async function run() {
       // console.log(userToken);
       const [userEmail, accessToken] = userToken?.split(" ");
       const decoded = verifyToken(accessToken)
+      console.log(decoded);
       const email = req.query.email;
       const query = { email: email };
       if (userEmail === decoded.email) {
@@ -105,9 +107,7 @@ async function run() {
     app.post("/login", async (req, res) => {
       const email = req.body;
       // console.log(email);
-      const token = await jwt.sign(email, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "1d",
-      });
+      const token = await jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
       // console.log(token);
       res.send({ token: token });
     });
